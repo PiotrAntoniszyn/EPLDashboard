@@ -1,0 +1,26 @@
+*
+{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+#app-root{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1D70A2;
+    font: 15px courier,arial,helvetica;
+    overflow: hidden;
+}
+
+#footer{
+    background-color: white;
+    width: 90%;
+    margin-top: 1em;
+    text-align: center;
+    padding: 0.25em;
+    font-size: x-small;
+    flex-shrink: 0;
+}

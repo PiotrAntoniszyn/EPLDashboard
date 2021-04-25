@@ -1,0 +1,39 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: white;
+}
+
+.parent{
+    height: 100vh;
+    border: 20px solid black;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.child1{
+    width: 200px;
+    height: 200px;
+    background-color: red;
+    flex: 1 1 300px;
+}
+
+.child2{
+    width: 200px;
+    height: 200px;
+    background-color: orange;
+    flex: 1 1 300px;
+    align-self: center;
+}
+
+.child3{
+    width: 200px;
+    height: 200px;
+    background-color: greenyellow;
+    flex: 1 1 300px;
+    align-self: flex-end;
+}
