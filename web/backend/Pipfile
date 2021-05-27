@@ -4,15 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "*"
-uvicorn = "*"
-uvloop = "==0.15.0"
-pytest = "*"
-sqlalchemy = "*"
 
 [dev-packages]
-black = "21.5b1"
-isort = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.9"
