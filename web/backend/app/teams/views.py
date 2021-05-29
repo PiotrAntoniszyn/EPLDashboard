@@ -1,8 +1,8 @@
-from rest_framework.response import Response
 from rest_framework.decorators import api_view
-
-from teams.serializers import PlayerSerializer
+from rest_framework.response import Response
 from teams.models import Player
+from teams.serializers import PlayerSerializer
+
 
 @api_view(["GET"])
 def get_players(request):

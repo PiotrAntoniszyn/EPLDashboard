@@ -4,12 +4,11 @@ from rest_framework.test import APITestCase
 
 
 class TestMetricsEndpoint(APITestCase):
-
     def test_ok(self):
         """
         Ensure we can create a new account object.
         """
-        url = reverse('get_radar_metrics')
+        url = reverse("get_radar_metrics")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         expected_response = [
