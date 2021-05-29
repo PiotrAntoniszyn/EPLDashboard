@@ -53,11 +53,9 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ORIGIN_WHITELIST = (
-#        'http://localhost:3000',
-#        'http://127.0.0.1:3000'
-# )
+
+ALLOWED_HOSTS = ["localhost"]
+CORS_ORIGIN_WHITELIST = ("http://localhost:3000", "http://127.0.0.1:3000")
 # REST_FRAMEWORK = {
 #     'DEFAULT_PERMISSION_CLASSES': [
 #         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'

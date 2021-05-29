@@ -11,7 +11,7 @@ class RadarChartSerializer(serializers.Serializer):
     def validate_player_id(self, player_id):
         if not Player.objects.filter(id=player_id).exists():
             raise serializers.ValidationError(
-                f"Player with id={player_id} does not exists"
+                f"Player with id={player_id} does not exist"
             )
         return player_id
 
