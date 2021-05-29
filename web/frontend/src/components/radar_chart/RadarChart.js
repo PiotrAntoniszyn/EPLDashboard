@@ -29,7 +29,7 @@ class RadarChart extends React.Component {
 
   componentDidUpdate(prevProps, _) {
     if (
-      (prevProps.teamID !== this.props.teamID && this.props.teamID !== "") ||
+      (prevProps.playerID !== this.props.playerID && this.props.playerID !== "") ||
       prevProps.metrics !== this.props.metrics
     ) {
       this.setState({error: null});
@@ -41,14 +41,14 @@ class RadarChart extends React.Component {
   }
 
   async getMetrics() {
-    if (this.props.teamID === null | this.props.teamID === ""){
+    if (this.props.playerID === null | this.props.playerID === ""){
       this.setState({error: "You must pick a player, dummy!"})
       return
     }
     const apiUrl = QueryString.stringifyUrl({
       url: API_ROOT_URL + "/radar",
       query: {
-        player_id: this.props.teamID,
+        player_id: this.props.playerID,
         metrics: this.props.metrics.length === 0 ? [] : this.props.metrics,
       },
     });
@@ -123,4 +123,7 @@ class RadarChart extends React.Component {
   }
 }
 
-export default RadarChart;
+export {
+  RadarChart,
+  API_ROOT_URL
+}

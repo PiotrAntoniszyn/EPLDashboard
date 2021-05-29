@@ -15,14 +15,3 @@
     flex-wrap: wrap;
     color: #000;    
 }
-
-.radar-team-data-container{
-    background: white;
-    color: #000;
-    flex-wrap: wrap;
-    box-shadow: 3px 5px 8px 2px #1D70A2;
-    width: 40%;
-    height: 88%;
-    align-content: flex-start;
-    flex-direction: row;
-}

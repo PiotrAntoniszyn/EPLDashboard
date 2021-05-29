@@ -1,10 +1,12 @@
 import React from "react";
 import Select from "react-select";
+import * as QueryString from "query-string";
 
 import "./RadarChartPicker.css";
 import boot from "../imgs/boot.svg";
 import strategy from "../imgs/strategy.svg";
 
+import { API_ROOT_URL } from "../components/radar_chart/RadarChart";
 class RadarChartPicker extends React.Component {
   constructor() {
     super();
@@ -20,14 +22,18 @@ class RadarChartPicker extends React.Component {
   }
 
   async componentDidMount() {
-    const metricsUrl = await "http://localhost:2137/radar/metrics";
-    const metricsResponse = await fetch(metricsUrl);
-    const metricsNames = await metricsResponse.json();
+    let apiUrl = QueryString.stringifyUrl({ url: API_ROOT_URL + "/metrics/radar" });
+    await fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => { this.setState({metricsNames: data})})
+      .catch((error) => { console.log("Unable to get metrics: ", error)});
+    
 
-    const playerUrl = await "http://localhost:2137/metrics/player";
-    const playerResponse = await fetch(playerUrl);
-    const playerNames = await playerResponse.json();
-    this.setState({ metricsNames: metricsNames, playerNames: playerNames });
+    apiUrl = QueryString.stringifyUrl({ url: API_ROOT_URL + "/metrics/player" });
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => { this.setState({playerNames: data})})
+      .catch((error) => { console.log("Unable to get playerNames: ", error)});
   }
 
   pickersData = () => {
@@ -47,7 +53,6 @@ class RadarChartPicker extends React.Component {
   }
 
   handleMetricsOnChange(event) {
-    console.log("Updating metrics");
     this.setState({ selectedMetrics: event });
   }
 
@@ -57,6 +62,7 @@ class RadarChartPicker extends React.Component {
         <img
           src={boot}
           style={{ transform: "rotate(-45deg)", width: "3em", height: "3em" }}
+          alt="Players not found"
         ></img>
         <p>Sorry, but it seems like we cannot fetch any players!</p>
       </div>
@@ -66,7 +72,11 @@ class RadarChartPicker extends React.Component {
   handleNoMetricsOptions() {
     return (
       <div>
-        <img src={strategy} style={{ width: "3em", height: "3em" }}></img>
+        <img
+          src={strategy}
+          style={{ width: "3em", height: "3em" }}
+          alt="Metrics not found"
+        ></img>
         <p>Sorry, but it seems like we cannot fetch any metrics!</p>
       </div>
     );
@@ -77,7 +87,6 @@ class RadarChartPicker extends React.Component {
       <form
         onSubmit={(event) => this.handleSubmit(event)}
         className="radar-chart-selector"
-        data-testid="DUPA"
       >
         <Select
           className="player-selector"

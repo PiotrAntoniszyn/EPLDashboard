@@ -2,8 +2,8 @@ import React from "react";
 
 import "./RadarChartContainer.css";
 import RadarChartPicker from "../../pickers/RadarCharPicker";
-import RadarChart from "./RadarChart"
-import logo from "../../imgs/football-badge.svg";
+import { RadarChart } from "./RadarChart";
+import PlayerInfo from "../team_info/PlayerInfo";
 
 
 
@@ -11,26 +11,21 @@ class RadarChartContainer extends React.Component {
   constructor() {
     super();
     this.state = {
-      teamID: null,
+      playerID: null,
       metrics: [],
     };
   }
 
-  pickersData = (teamID, metrics) => {
-    this.setState({ teamID, metrics });
+  pickersData = (playerID, metrics) => {
+    this.setState({ playerID, metrics });
   };
 
   render() {
     return (
       <div className="radar-container">
         <RadarChartPicker pickersData={this.pickersData} />
-        <div className="radar-team-data-container">
-          <div style={{ width: "100%" }}>
-            <img alt="football-badge" src={logo} width="80" height="80"></img>
-          </div>
-          <p>Team Info: {this.state.teamID}</p>
-        </div>
-        <RadarChart teamID={this.state.teamID} metrics={this.state.metrics}/>
+        <PlayerInfo playerID={this.state.playerID}/>
+        <RadarChart playerID={this.state.playerID} metrics={this.state.metrics}/>
       </div>
     );
   }
