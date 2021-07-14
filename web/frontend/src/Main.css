@@ -24,3 +24,26 @@
     font-size: x-small;
     flex-shrink: 0;
 }
+
+#nav-bar{
+    display: flex;
+    background-color: white;
+    justify-content: flex-end;
+    width: 90%;
+    margin-top: 15px;
+    border-radius: 4px;
+    height: 40px;
+    
+}
+
+.base-container {
+    background: #6DAEDB;
+    width: 90%;
+    display: flex;
+    margin-top: 30px;
+    color: rgb(252, 250, 252);
+    border-radius: 10px;
+    padding: 20px;
+    flex-wrap: wrap;
+    height: 60%;
+}
