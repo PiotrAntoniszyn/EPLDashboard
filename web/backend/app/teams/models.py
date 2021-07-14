@@ -5,9 +5,6 @@ from django.db.models.deletion import DO_NOTHING
 class Team(models.base.Model):
     name = models.CharField(max_length=120)
 
-    def __repr__(self) -> str:
-        return f"{self.name}"
-
     def __str__(self) -> str:
         return f"{self.name}"
 
@@ -22,9 +19,6 @@ class Player(models.base.Model):
         Team, on_delete=DO_NOTHING, null=True, related_name="players"
     )
     score = models.IntegerField(default=0)
-
-    def __repr__(self) -> str:
-        return f"{self.first_name} {self.last_name} [{self.team}]"
 
     def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} [{self.team}]"

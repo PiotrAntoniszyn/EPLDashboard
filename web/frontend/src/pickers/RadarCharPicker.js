@@ -25,7 +25,16 @@ class RadarChartPicker extends React.Component {
     let apiUrl = QueryString.stringifyUrl({ url: API_ROOT_URL + "/metrics/radar" });
     await fetch(apiUrl)
       .then((response) => response.json())
-      .then((data) => { this.setState({metricsNames: data})})
+      .then(
+        (data) => {
+          const metrics = data.map(
+            (el) => (
+              {"value": el.id, "label": el.display_name}
+            )
+          );
+          this.setState({metricsNames: metrics})
+        }
+      )
       .catch((error) => { console.log("Unable to get metrics: ", error)});
     
 

@@ -49,7 +49,7 @@ class RadarChart extends React.Component {
       url: API_ROOT_URL + "/radar",
       query: {
         player_id: this.props.playerID,
-        metrics: this.props.metrics.length === 0 ? [] : this.props.metrics,
+        metrics_ids: this.props.metrics.length === 0 ? [] : this.props.metrics,
       },
     });
     const response = await fetch(apiUrl);

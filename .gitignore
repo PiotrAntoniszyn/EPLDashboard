@@ -4,5 +4,5 @@ web/.vscode/
 web/backend/app/fixtures/
 web/backend/.mypy_cache/
 web/backend/.pytest_cache/
-web/backend/*.db
+web/backend/app/*.db
 

@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from metrics.views import RadarChartEndpoint, get_radar_metrics
+from metrics.views import RadarChartEndpoint, RadarMetricsListEndpoint
 from teams.views import get_player_by_id, get_players
 
 urlpatterns = [
     path("metrics/player", get_players, name="get_players"),
-    path("metrics/radar", get_radar_metrics, name="get_radar_metrics"),
+    path("metrics/radar", RadarMetricsListEndpoint.as_view(), name="get_radar_metrics"),
     path("radar", RadarChartEndpoint.as_view(), name="get_radar_chart"),
     path("teams/players/<int:player_id>", get_player_by_id, name="get_player_by_id"),
     path("api-auth/", include("rest_framework.urls")),
