@@ -1,0 +1,16 @@
+scipy==1.6.2
+lxml==4.6.3
+ipywidgets==7.6.3
+pandas==1.2.4
+matplotlib==3.3.4
+aiohttp==3.7.4.post0
+highlight_text==0.2
+html5lib==1.1
+requests==2.25.1
+understat==0.1.4
+numpy==1.20.1
+beautifulsoup4==4.9.3
+mplsoccer==1.0.5
+Pillow==8.3.1
+plotly==5.1.0
+streamlit==0.86.0
