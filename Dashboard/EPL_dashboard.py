@@ -179,7 +179,7 @@ st.title("Premier League Team Dashboard | Season 20/21 ")
 
 #######################
 
-col1, col2, col3 = st.beta_columns([1,2,2])
+col1, col2, col3 = st.columns([1,2,2])
 
 playerdb = pdb.createDatabase()
 
@@ -191,10 +191,10 @@ main = prepare()
 
 st.sidebar.header("Dashboard Settings")
 
-with st.sidebar.beta_expander("Club"):
+with st.sidebar.expander("Club"):
   selected_club = st.selectbox("",options=list(main['Squad'].sort_values(ascending=True)))
 
-with st.sidebar.beta_expander("View Mode"):
+with st.sidebar.expander("View Mode"):
   mode = st.radio("", ("Percentile","Stats"))
 
   # bar=st.progress(0)
@@ -205,24 +205,24 @@ with st.sidebar.beta_expander("View Mode"):
 
 st.sidebar.header("Player Comparison Settings")
 
-with st.sidebar.beta_expander("Metrics"):
+with st.sidebar.expander("Metrics"):
   categories = st.multiselect('',list(playerdb.columns[10:]),list(playerdb.columns[14:19]))
 
-with st.sidebar.beta_expander("Players"):
+with st.sidebar.expander("Players"):
   player1 = st.selectbox("Player 1:",options=list(playerdb[playerdb['Squad']==selected_club]['Player'].sort_values(ascending=True)),index=0)
   player2 = st.selectbox("Player 2:",options=list(playerdb[playerdb['Squad']==selected_club]['Player'].sort_values(ascending=True)),index=1)
 
-image = Image.open('PL_Logos\{}.png'.format(selected_club))
+image = Image.open('PL_Logos/{}.png'.format(selected_club))
 
-with st.beta_expander("Browse squad data"):
+with st.expander("Browse squad data"):
   st.dataframe(playerdb[playerdb['Squad']==selected_club].reset_index(drop=True))
 
-with st.sidebar.beta_expander("Scatter Plot Settings"):
+with st.sidebar.expander("Scatter Plot Settings"):
   cat1 = st.selectbox('X',options=list(playerdb.columns[10:]),index=9)
   cat2 = st.selectbox('Y',options=list(playerdb.columns[10:]),index=11)
 
 with col1:
-  with st.beta_container():
+  with st.container():
     st.image(image, width=80)
     st.text("Rank: {} - {} pts".format(leaguetable[leaguetable['Squad']==selected_club]['Rk'].reset_index(drop=True)[0],leaguetable[leaguetable['Squad']==selected_club]['Pts'].reset_index(drop=True)[0]))
     st.text(" {} - {} - {}".format(leaguetable[leaguetable['Squad']==selected_club]['W'].reset_index(drop=True)[0],leaguetable[leaguetable['Squad']==selected_club]['D'].reset_index(drop=True)[0],leaguetable[leaguetable['Squad']==selected_club]['L'].reset_index(drop=True)[0]))
@@ -373,7 +373,7 @@ with col3:
 
 #######################
 
-col21, col22 = st.beta_columns(2)
+col21, col22 = st.columns(2)
 
 #######################
 
