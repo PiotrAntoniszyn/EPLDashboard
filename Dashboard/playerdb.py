@@ -10,21 +10,27 @@ import lxml.html as lh
 import streamlit as st
 
 @st.cache
-def createDatabase():
-    url = 'https://fbref.com/en/comps/9/10728/stats/2020-2021-Premier-League-Stats'
+def createDatabase(season):
+    if season == 2020:
+        url = 'https://fbref.com/en/comps/9/10728/stats/2020-2021-Premier-League-Stats'
+        url2 = 'https://fbref.com/en/comps/9/10728/gca/2020-2021-Premier-League-Stats'
+        url3 = 'https://fbref.com/en/comps/9/10728/shooting/2020-2021-Premier-League-Stats'
+        url4 = 'https://fbref.com/en/comps/9/10728/passing/2020-2021-Premier-League-Stats'
+    elif season == 2021:
+        url = 'https://fbref.com/en/comps/9/stats/Premier-League-Stats'
+        url2 = 'https://fbref.com/en/comps/9/gca/Premier-League-Stats'
+        url3 = 'https://fbref.com/en/comps/9/shooting/Premier-League-Stats'
+        url4 = 'https://fbref.com/en/comps/9/passing/Premier-League-Stats'
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
 
     table = BeautifulSoup(soup.select_one('#all_stats_standard').find_next(text=lambda x: isinstance(x, Comment)), 'html.parser')
-    url2 = 'https://fbref.com/en/comps/9/10728/gca/2020-2021-Premier-League-Stats'
     soup2 = BeautifulSoup(requests.get(url2).content, 'html.parser')
 
     table2 = BeautifulSoup(soup2.select_one('#all_stats_gca').find_next(text=lambda x: isinstance(x, Comment)), 'html.parser')
 
-    url3 = 'https://fbref.com/en/comps/9/10728/shooting/2020-2021-Premier-League-Stats'
     soup3 = BeautifulSoup(requests.get(url3).content, 'html.parser')
 
     table3 = BeautifulSoup(soup3.select_one('#all_stats_shooting').find_next(text=lambda x: isinstance(x, Comment)), 'html.parser')
-    url4 = 'https://fbref.com/en/comps/9/10728/passing/2020-2021-Premier-League-Stats'
     soup4 = BeautifulSoup(requests.get(url4).content, 'html.parser')
 
     table4 = BeautifulSoup(soup4.select_one('#all_stats_passing').find_next(text=lambda x: isinstance(x, Comment)), 'html.parser')
@@ -85,10 +91,15 @@ def createDatabase():
     return main_df
 
 @st.cache
-def createTable():
-    url = 'https://fbref.com/en/comps/9/10728/2020-2021-Premier-League-Stats'
-    soup = BeautifulSoup(requests.get(url).content, 'html.parser')
-    table = soup.find("table",{"id":"results107281_overall"})
+def createTable(season):
+    if season == 2020:
+        url = 'https://fbref.com/en/comps/9/10728/2020-2021-Premier-League-Stats'
+        soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+        table = soup.find("table",{"id":"results107281_overall"})
+    elif season == 2021:
+        url = 'https://fbref.com/en/comps/9/Premier-League-Stats'
+        soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+        table = soup.find("table",{"id":"results111601_overall"})
     table = pd.read_html(table.prettify(),encoding='utf-8')
     table_df = pd.DataFrame(table[0])
     return table_df

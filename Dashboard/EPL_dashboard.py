@@ -53,14 +53,14 @@ URL6 = 'https://github.com/googlefonts/roboto/blob/main/src/hinted/Roboto-Bold.t
 robotto_bold = FontManager(URL6)
 
 
-edge_team_colors = {'Arsenal':'#063672', 'Aston Villa':'#670E36', 'Bournemouth':'#da291c', 'Brighton':'#FFFFFF',
+edge_team_colors = {'Arsenal':'#063672', 'Aston Villa':'#670E36', 'Bournemouth':'#da291c','Brentford':'#FFFFFF',  'Brighton':'#FFFFFF',
                'Burnley':'#99D6EA', 'Chelsea':'#D1D3D4', 'Crystal Palace':'#C4122E', 'Everton':'#FFFFFF', "Fulham": "#FFFFFF",
                'Leicester City': '#FDBE11', "Leeds United": "#FFCD00", 'Liverpool':'#00B2A9', 'Manchester City':'#1C2C5B', 'Manchester Utd':'#FBE122',
                'Newcastle':'#F1BE48', 'Norwich':'#00A650', 'Sheffield Utd':'#0D171A', 
                'Southampton':'#130C0E', 'Tottenham':'#FFFFFF', 'Watford':'#ED2127', "West Brom": '#FFFFFF', 'West Ham':'#1BB1E7',
                'Wolves':'#231F20'}
 
-team_colors = {'Arsenal':'#ef0107', 'Aston Villa':'#95bfe5', 'Bournemouth':'#000000', 'Brighton':'#0057b8',
+team_colors = {'Arsenal':'#ef0107', 'Aston Villa':'#95bfe5', 'Bournemouth':'#000000','Brentford':'#D60019', 'Brighton':'#0057b8',
                'Burnley':'#6c1d45', 'Chelsea':'#034694', 'Crystal Palace':'#1b458f', 'Everton':'#003399', "Fulham": "#000000",
                'Leicester City':'#003090', "Leeds United": "#1D428A", 'Liverpool':'#c8102e', 'Manchester City':'#6cabdd', 'Manchester Utd':'#da291c',
                'Newcastle Utd':'#241f20', 'Norwich':'#fff200', 'Sheffield Utd':'#ee2737', 
@@ -70,7 +70,7 @@ team_colors = {'Arsenal':'#ef0107', 'Aston Villa':'#95bfe5', 'Bournemouth':'#000
 #######################
 
 st.set_page_config(
- page_title="EPL 20/21 Team Dashboard",
+ page_title="EPL Team Dashboard",
  page_icon=":trophy:",
  layout="wide",
  initial_sidebar_state="auto",
@@ -78,8 +78,11 @@ st.set_page_config(
 
 
 @st.cache
-def prepare():
-  url = 'https://fbref.com/en/comps/9/10728/2020-2021-Premier-League-Stats'
+def prepare(season):
+  if season == 2020:
+    url = 'https://fbref.com/en/comps/9/10728/2020-2021-Premier-League-Stats'
+  elif season == 2021:
+    url = 'https://fbref.com/en/comps/9/Premier-League-Stats'
   soup = BeautifulSoup(requests.get(url).content, 'html.parser')
 
 
@@ -175,21 +178,31 @@ def radar_mosaic(radar_height=0.915, title_height=0.06, figheight=14):
 
 #######################
 
-st.title("Premier League Team Dashboard | Season 20/21 ")
+# st.title("Premier League Team Dashboard | Season {}/{} ".format(season,season+1))
 
 #######################
 
 col1, col2, col3 = st.columns([1,2,2])
+# playerdb = pdb.createDatabase(season)
 
-playerdb = pdb.createDatabase()
+# leaguetable = pdb.createTable(season)
 
-leaguetable = pdb.createTable()
-
-main = prepare()
+# main = prepare(season)
 
 #######################
 
 st.sidebar.header("Dashboard Settings")
+
+with st.sidebar.expander("Season"):
+  season = st.selectbox("",options=[2021,2020])
+
+st.title("Premier League Team Dashboard | Season {}/{} ".format(season,season+1))
+
+playerdb = pdb.createDatabase(season)
+
+leaguetable = pdb.createTable(season)
+
+main = prepare(season)
 
 with st.sidebar.expander("Club"):
   selected_club = st.selectbox("",options=list(main['Squad'].sort_values(ascending=True)))
@@ -201,12 +214,12 @@ with st.sidebar.expander("View Mode"):
   # time.sleep(0.01)
   # for x in range(100):
   #   time.sleep(.001)
-  #   bar.progress(x+1)
+  #   bar.progress(x+1)ó
 
 st.sidebar.header("Player Comparison Settings")
 
 with st.sidebar.expander("Metrics"):
-  categories = st.multiselect('',list(playerdb.columns[10:]),list(playerdb.columns[14:19]))
+  categories = st.multiselect('',list(playerdb.columns[10:]),['xG','xA','Shot Creating Actions','Shots','Shots on target','Key Passes','Crosses into penalty area','Final third passes'])
 
 with st.sidebar.expander("Players"):
   player1 = st.selectbox("Player 1:",options=list(playerdb[playerdb['Squad']==selected_club]['Player'].sort_values(ascending=True)),index=0)
@@ -267,6 +280,10 @@ else:
   low = []
   high = []
   for x in categories:
+    if max(playerdb['Min'])<300:
+      low.append(min(playerdb[x]))
+      high.append(max(playerdb[x]))
+    else:
       low.append(min(playerdb[playerdb['Min']>300][x]))
       high.append(max(playerdb[playerdb['Min']>300][x]))
   pvalues1 = playerdb.iloc[playerdb[playerdb['Player'].str.contains(player1)==True].index[0]][categories]
