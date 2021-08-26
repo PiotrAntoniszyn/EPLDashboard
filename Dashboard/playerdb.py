@@ -8,6 +8,9 @@ import sys
 from bs4 import BeautifulSoup, Comment
 import lxml.html as lh
 import streamlit as st
+from datetime import datetime
+from dateutil import relativedelta
+
 
 @st.cache
 def createDatabase(season):
@@ -103,3 +106,25 @@ def createTable(season):
     table = pd.read_html(table.prettify(),encoding='utf-8')
     table_df = pd.DataFrame(table[0])
     return table_df
+
+@st.cache()
+def createCalendar():
+    # url = 'https://fantasy.premierleague.com/api/fixtures/'
+    # soup = BeautifulSoup(requests.get(url).content, 'html.parser')
+    r=requests.get('https://fantasy.premierleague.com/api/fixtures/')
+    calendar = r.json()
+    cal_df = pd.DataFrame(calendar)
+    t = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/')
+    fpl_data = t.json()
+    team_df = pd.DataFrame(fpl_data['teams'])
+    team_df = team_df[['id','name','form','strength', 'strength_overall_home', 'strength_overall_away',
+       'strength_attack_home', 'strength_attack_away', 'strength_defence_home',
+       'strength_defence_away']]
+    cal_df['team_a'] = cal_df['team_a'].replace(list(team_df['id']),list(team_df['name']))
+    cal_df['team_h'] = cal_df['team_h'].replace(list(team_df['id']),list(team_df['name']))
+    for x in range(len(cal_df)):
+        cal_df['kickoff_time'][x] = cal_df['kickoff_time'][x][:10] + ' ' +cal_df['kickoff_time'][x][-9:-1]
+    cal_df['kickoff_time'] = cal_df['kickoff_time'].astype('datetime64')
+    cal_df = cal_df[['id','team_h','team_a','team_h_score','team_a_score','kickoff_time','stats']]
+
+    return cal_df,team_df
