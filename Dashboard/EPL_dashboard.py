@@ -511,7 +511,7 @@ elif page == 'FPL Player Comparison':
   calendar_temp['team_h'] = calendar_temp['team_h'].replace(list(calendar_temp['team_h'].sort_values().unique()),list(main['Squad']))
   print(calendar_temp)
   print(team_form_temp)
-  fixes = pd.read_csv('fixes.csv').drop('Unnamed: 0',axis=1)
+  fixes = pd.read_csv('Dashboard/fixes.csv').drop('Unnamed: 0',axis=1)
   fixes = fixes.set_index('name')
 
   st.sidebar.header("Comparison Tools")
