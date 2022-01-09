@@ -102,7 +102,7 @@ def createFPLDB():
     fpl = elements_team.copy()
 
 
-    df = pd.read_csv('ID_Dictionary.csv',encoding='cp1252').sort_values('FPL name',ascending=True)
+    df = pd.read_csv('Dashboard/ID_Dictionary.csv',encoding='cp1252').sort_values('FPL name',ascending=True)
 
     df = df[['fbref','fbref ID','FPL name','FPL ID','Team']]
 

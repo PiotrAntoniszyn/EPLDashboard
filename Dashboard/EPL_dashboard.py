@@ -532,7 +532,7 @@ elif page == 'FPL Player Comparison':
   team_form_temp['name'] = main['Squad'].copy()
   calendar_temp['team_a'] = calendar_temp['team_a'].replace(list(calendar_temp['team_a'].sort_values().unique()),list(main['Squad']))
   calendar_temp['team_h'] = calendar_temp['team_h'].replace(list(calendar_temp['team_h'].sort_values().unique()),list(main['Squad']))
-  fixes = pd.read_csv('Dashboard/ fixes.csv').drop('Unnamed: 0',axis=1)
+  fixes = pd.read_csv('Dashboard/fixes.csv').drop('Unnamed: 0',axis=1)
   fixes = fixes.set_index('name')
 
   minutes = playerdb[['Min','Starts','chance_of_playing_this_round','chance_of_playing_next_round']].astype('float64').fillna(100.0)
