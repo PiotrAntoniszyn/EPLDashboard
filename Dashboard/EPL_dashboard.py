@@ -309,7 +309,7 @@ if page == 'Team Performance Dashboard':
 
 
 
-  image = Image.open('PL_Logos/{}.png'.format(selected_club))
+  image = Image.open('/PL_Logos/{}.png'.format(selected_club))
 
   with st.expander("Browse squad data"):
     st.dataframe(playerdb[playerdb['Squad']==selected_club].reset_index(drop=True))
