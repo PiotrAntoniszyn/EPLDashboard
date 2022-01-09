@@ -18,6 +18,7 @@ import html5lib
 from understat import Understat
 import streamlit as st
 import time
+import fpldb as fpldb
 import playerdb as pdb
 import plotly.express as px
 import plotly.graph_objects as go
@@ -184,11 +185,9 @@ def show_next_five(calendar, selected_club):
   for x in range(len(tmp)):
       if tmp.iloc[x]['team_a'] == selected_club:
           next_five.append(tmp.iloc[x]['team_h']+ '(A)')
-          print("adding {}".format(tmp.iloc[x]['team_h']))
 
       elif tmp.iloc[x]['team_h'] == selected_club: 
           next_five.append(tmp.iloc[x]['team_a'] + '(H)')
-          print("adding {}".format(tmp.iloc[x]['team_a']))
 
       if len(next_five)==5:
           break
@@ -200,8 +199,6 @@ def fixStrength(next_five):
     strength = 0
     for x in next_five:
         y=x[:-3]
-        print (x,y)
-        print(team_form_temp[team_form_temp['name']==y])
         strength += int(team_form_temp[team_form_temp['name']==y]['strength'])
     if strength > 20:
       return '{}/25 - Very Hard'.format(strength)
@@ -214,6 +211,34 @@ def fixStrength(next_five):
     else:
       return '{}/25 - Very Easy'.format(strength)
 
+
+def expPoints(opp,player,player_team):
+  team = opp[:-3]
+  h_a =opp[-3:]  
+  if h_a == '(H)':
+    str_attack = (team_form_temp.iloc[team_form_temp[team_form_temp['name']==player_team].index[0]]['strength_attack_home'] - team_form_temp[team_form_temp['name']==team]['strength_defence_away'])*0.01
+    strength = 1 - team_form_temp[team_form_temp['name']==team]['strength_attack_away']/2000
+  else:
+    str_attack = (team_form_temp.iloc[team_form_temp[team_form_temp['name']==player_team].index[0]]['strength_attack_away'] - team_form_temp[team_form_temp['name']==team]['strength_defence_home'])*0.01
+    strength = 1 - team_form_temp[team_form_temp['name']==team]['strength_attack_home']/2000
+   
+  cats = ['xA/90','xG/90','yellow_cards','red_cards','bonus','minutes','element_type']
+
+  tmp = playerdb.iloc[playerdb[playerdb['Player'].str.contains(player)==True].index[0]][cats]
+  pos = {'1':[3,6,4],'2':[3,6,4],'3':[3,5,1],'4':[3,4,0]}
+  xmin = minutes.iloc[minutes[minutes['Player'].str.contains(player)==True].index[0]]['xMin']
+  mins = minutes.iloc[minutes[minutes['Player'].str.contains(player)==True].index[0]]['Min']
+  if xmin>=60:
+    xP = tmp[0] * pos[str(tmp[-1])][0] * (xmin/90) * str_attack + tmp[1] * pos[str(tmp[-1])][1] * (xmin/90) * str_attack + tmp[2]/tmp[-2] - tmp[3]/tmp[-2] + tmp[4]/(tmp[-2]/90)+ pos[str(tmp[-1])][2] * strength + 1 
+  else:
+    xP = tmp[0] * pos[str(tmp[-1])][0] * (xmin/90) * str_attack  + tmp[1] * pos[str(tmp[-1])][1] * (xmin/90)* str_attack  + tmp[2]/tmp[-2] - tmp[3]/tmp[-2] + tmp[4]/(tmp[-2]/90)
+  return round(xP,2)
+
+def exp_five(next_five,player,team):
+  exp = []
+  for x in next_five:
+    exp.append(float(expPoints(x,player,team)))
+  return exp
 
 #######################
 
@@ -235,7 +260,7 @@ calendar,team_form = pdb.createCalendar()
 st.sidebar.header("App Menu")
 
 with st.sidebar.expander("Page Selection"):
-  page = st.selectbox("",options=['Team Performance Dashboard','FPL Player Comparison'])
+  page = st.selectbox("",options=['Team Performance Dashboard','FPL Player Comparison', 'Top 10 in xP'])
 
 
 if page == 'Team Performance Dashboard':
@@ -284,7 +309,7 @@ if page == 'Team Performance Dashboard':
 
 
 
-  image = Image.open('Dashboard/PL_Logos/{}.png'.format(selected_club))
+  image = Image.open('PL_Logos/{}.png'.format(selected_club))
 
   with st.expander("Browse squad data"):
     st.dataframe(playerdb[playerdb['Squad']==selected_club].reset_index(drop=True))
@@ -497,22 +522,23 @@ if page == 'Team Performance Dashboard':
 
 elif page == 'FPL Player Comparison':
   season = 2021
-  playerdb = pdb.createDatabase(season)
+  playerdb = fpldb.createFPLDB()
 
   leaguetable = pdb.createTable(season)
 
   main = prepare(season)
   team_form_temp = team_form.copy()
   calendar_temp = calendar.copy()
-  print(calendar_temp)
-  print(team_form_temp)
   team_form_temp['name'] = main['Squad'].copy()
   calendar_temp['team_a'] = calendar_temp['team_a'].replace(list(calendar_temp['team_a'].sort_values().unique()),list(main['Squad']))
   calendar_temp['team_h'] = calendar_temp['team_h'].replace(list(calendar_temp['team_h'].sort_values().unique()),list(main['Squad']))
-  print(calendar_temp)
-  print(team_form_temp)
-  fixes = pd.read_csv('Dashboard/fixes.csv').drop('Unnamed: 0',axis=1)
+  fixes = pd.read_csv('fixes.csv').drop('Unnamed: 0',axis=1)
   fixes = fixes.set_index('name')
+
+  minutes = playerdb[['Min','Starts','chance_of_playing_this_round','chance_of_playing_next_round']].astype('float64').fillna(100.0)
+  minutes['Player'] = playerdb['Player'].copy()
+  minutes['xMin'] = (minutes['Starts']/max(minutes['Starts'])*minutes['Min']/max(minutes['Starts'])*0.95)*minutes['chance_of_playing_this_round']/100
+
 
   st.sidebar.header("Comparison Tools")
 
@@ -665,20 +691,98 @@ elif page == 'FPL Player Comparison':
   with col21:
     st.plotly_chart(fig,use_container_width=True)
     st.subheader('Next five matches')
+    team = playerdb.iloc[playerdb[playerdb['Player']==player1].index[0]]['Squad']
     next_five1 = show_next_five(calendar_temp,selected_club1)
     fixStr1 = fixStrength(next_five1)
+    exp1 = exp_five(next_five1,player1,team)
     st.write(' - '.join(map(str, show_next_five(calendar_temp,selected_club1))))
+    st.write(' - '.join(map(str, exp1)))
+    st.write("xPoints: {:.2f}".format(round(sum(exp1), 2)))
+
+
     st.write('Fixture difficulty: '+ fixStr1)
 
   with col22:
     st.plotly_chart(fig2,use_container_width=True)
     st.subheader('Next five matches')
+    team = playerdb.iloc[playerdb[playerdb['Player']==player2].index[0]]['Squad']
     next_five2 = show_next_five(calendar_temp,selected_club2)
     fixStr2 = fixStrength(next_five2)
+    exp2 = exp_five(next_five2,player2,team)
     st.write(' - '.join(map(str, show_next_five(calendar_temp,selected_club2))))
+    st.write(' - '.join(map(str, exp2)))
+
+    st.write("xPoints: {:.2f}".format(round(sum(exp2), 2)))
+
     st.write('Fixture difficulty: '+ fixStr2)
 
   player1
   playerdb[playerdb['Player'].str.contains(player1)==True][categories]
   player2
   playerdb[playerdb['Player'].str.contains(player2)==True][categories]
+
+elif page == 'Top 10 in xP':
+  season = 2021
+  playerdb = fpldb.createFPLDB()
+
+  leaguetable = pdb.createTable(season)
+
+  main = prepare(season)
+  
+  team_form_temp = team_form.copy()
+  calendar_temp = calendar.copy()
+  
+  team_form_temp['name'] = main['Squad'].copy()
+ 
+  calendar_temp['team_a'] = calendar_temp['team_a'].replace(list(calendar_temp['team_a'].sort_values().unique()),list(main['Squad']))
+  calendar_temp['team_h'] = calendar_temp['team_h'].replace(list(calendar_temp['team_h'].sort_values().unique()),list(main['Squad']))
+
+  fixes = pd.read_csv('fixes.csv').drop('Unnamed: 0',axis=1)
+  fixes = fixes.set_index('name')
+
+  minutes = playerdb[['Min','Starts','chance_of_playing_this_round','chance_of_playing_next_round']].astype('float64').fillna(100.0)
+  minutes['Player'] = playerdb['Player'].copy()
+  minutes['xMin'] = (minutes['Starts']/max(minutes['Starts'])*minutes['Min']/max(minutes['Starts'])*0.95)*minutes['chance_of_playing_this_round']/100
+
+
+  st.header("Top 50 in xP")
+  xP_table = []
+  for x in playerdb['Player']:
+    team = playerdb.iloc[playerdb[playerdb['Player']==x].index[0]]['Squad']
+    xmin = minutes.iloc[minutes[minutes['Player']==x].index[0]]['xMin']
+    nf = show_next_five(calendar_temp,team)
+    exp = exp_five(nf,x,team)
+    xP_table.append([x,xmin,sum(exp),nf[0],nf[1],nf[2],nf[3],nf[4]])
+  xP_df = pd.DataFrame(xP_table,columns=['Name','xMin','xP','1','2','3','4','5'])
+  st.write(xP_df.sort_values('xP',ascending=False).head(50))
+
+
+
+
+  # with col21:
+  #   st.plotly_chart(fig,use_container_width=True)
+  #   st.subheader('Next five matches')
+  #   next_five1 = show_next_five(calendar_temp,selected_club1)
+  #   fixStr1 = fixStrength(next_five1)
+  #   exp1 = exp_five(next_five1,player1)
+  #   st.write(' - '.join(map(str, show_next_five(calendar_temp,selected_club1))))
+  #   st.write("xPoints: {:.2f}".format(round(sum(exp1), 2)))
+
+
+  #   st.write('Fixture difficulty: '+ fixStr1)
+
+  # with col22:
+  #   st.plotly_chart(fig2,use_container_width=True)
+  #   st.subheader('Next five matches')
+  #   next_five2 = show_next_five(calendar_temp,selected_club2)
+  #   fixStr2 = fixStrength(next_five2)
+  #   exp2 = exp_five(next_five2,player2)
+  #   st.write(' - '.join(map(str, show_next_five(calendar_temp,selected_club2))))
+  #   st.write("xPoints: {:.2f}".format(round(sum(exp2), 2)))
+
+  #   st.write('Fixture difficulty: '+ fixStr2)
+
+  # player1
+  # playerdb[playerdb['Player'].str.contains(player1)==True][categories]
+  # player2
+  # playerdb[playerdb['Player'].str.contains(player2)==True][categories]

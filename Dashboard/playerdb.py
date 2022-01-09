@@ -123,7 +123,10 @@ def createCalendar():
     cal_df['team_a'] = cal_df['team_a'].replace(list(team_df['id']),list(team_df['name']))
     cal_df['team_h'] = cal_df['team_h'].replace(list(team_df['id']),list(team_df['name']))
     for x in range(len(cal_df)):
-        cal_df['kickoff_time'][x] = cal_df['kickoff_time'][x][:10] + ' ' +cal_df['kickoff_time'][x][-9:-1]
+        try:
+            cal_df['kickoff_time'][x] = cal_df['kickoff_time'][x][:10] + ' ' +cal_df['kickoff_time'][x][-9:-1]
+        except(TypeError):
+            pass
     cal_df['kickoff_time'] = cal_df['kickoff_time'].astype('datetime64')
     cal_df = cal_df[['id','team_h','team_a','team_h_score','team_a_score','kickoff_time','stats']]
 
