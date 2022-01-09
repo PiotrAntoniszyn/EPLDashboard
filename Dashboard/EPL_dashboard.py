@@ -721,7 +721,7 @@ elif page == 'FPL Player Comparison':
   player2
   playerdb[playerdb['Player'].str.contains(player2)==True][categories]
 
-elif page == 'Top 10 in xP':
+elif page == 'Top 50 in xP - next 5 games':
   season = 2021
   playerdb = fpldb.createFPLDB()
 
@@ -745,7 +745,7 @@ elif page == 'Top 10 in xP':
   minutes['xMin'] = (minutes['Starts']/max(minutes['Starts'])*minutes['Min']/max(minutes['Starts'])*0.95)*minutes['chance_of_playing_this_round']/100
 
 
-  st.header("Top 50 in xP")
+  st.header("Top 50 in xP - next 5 games")
   xP_table = []
   for x in playerdb['Player']:
     team = playerdb.iloc[playerdb[playerdb['Player']==x].index[0]]['Squad']
